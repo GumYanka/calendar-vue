@@ -1,0 +1,4 @@
+const index_vue_vue_type_style_index_0_scoped_0d6abad0_lang = "[data-v-0d6abad0] .custom-calendar .fc-col-header-cell{--tw-bg-opacity:1;background-color:rgb(243 244 246/var(--tw-bg-opacity,1));padding-bottom:.75rem;padding-top:.75rem}[data-v-0d6abad0] .custom-calendar .fc-col-header-cell-cushion{font-weight:500;--tw-text-opacity:1;color:rgb(107 114 128/var(--tw-text-opacity,1))}[data-v-0d6abad0] .fc-event-dot{display:none!important}[data-v-0d6abad0] .fc-event{border:2px solid transparent;box-sizing:border-box;padding:4px 0}input[type=date][data-v-0d6abad0]::-webkit-calendar-picker-indicator,input[type=time][data-v-0d6abad0]::-webkit-calendar-picker-indicator{display:none;opacity:0}input[type=date][data-v-0d6abad0],input[type=time][data-v-0d6abad0]{-moz-appearance:textfield}";
+
+export { index_vue_vue_type_style_index_0_scoped_0d6abad0_lang as i };
+//# sourceMappingURL=index-styles-1.mjs-B_HM1vTZ.mjs.map
