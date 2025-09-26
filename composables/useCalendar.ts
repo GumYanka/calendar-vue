@@ -1,4 +1,5 @@
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
+import type { CalendarOptions } from "@fullcalendar/core";
 import { validateEvent } from "~/utils/calendarUtils";
 import {
   DEFAULT_EVENT_COLOR,
@@ -12,12 +13,13 @@ export function useCalendar() {
   const events = reactive<any[]>([]);
   const selectedView = ref(VIEWS.MONTH);
   const currentTitle = ref("");
-  const currentView = ref<any>(null);
+  const todayActive = ref(false);
+  const currentViewType = ref<string>(VIEWS.MONTH);
 
   const menu = ref(false);
   const calendarWrapper = ref<HTMLElement | null>(null);
   const menuPosition = reactive({ top: 0, left: 0 });
-  const menuWidth = ref("250px");
+  const menuWidth = ref(DEFAULT_POPUP_WIDTH + "px");
 
   const selectedDate = ref("");
   const editing = ref(false);
@@ -109,62 +111,51 @@ export function useCalendar() {
     currentTitle.value = api.view.title;
   }
 
-  function goToday() {
-    const api = calendarRef.value?.getApi?.();
-    if (!api) return;
-    api.today();
-    updateTitle();
-  }
-
-  function goPrev() {
-    const api = calendarRef.value?.getApi?.();
-    if (!api) return;
-    api.prev();
-    updateTitle();
-  }
-
-  function goNext() {
-    const api = calendarRef.value?.getApi?.();
-    if (!api) return;
-    api.next();
-    updateTitle();
-  }
-
-  function changeView(view: string) {
-    selectedView.value = view;
-    const api = calendarRef.value?.getApi?.();
-    if (!api) return;
-    api.changeView(view);
-    updateTitle();
-  }
-
-  const isTodayActive = () => {
-    if (!currentView.value) return false;
-    const today = new Date();
-    return (
-      today >= currentView.value.currentStart &&
-      today < currentView.value.currentEnd
-    );
+  const goToday = () => {
+    calendarRef.value?.getApi()?.today();
+    updateTodayActive();
+  };
+  const goPrev = () => {
+    calendarRef.value?.getApi()?.prev();
+    updateTodayActive();
+  };
+  const goNext = () => {
+    calendarRef.value?.getApi()?.next();
+    updateTodayActive();
+  };
+  const changeView = (view: string) => {
+    calendarRef.value?.getApi()?.changeView(view);
+    currentViewType.value = view;
+    updateTodayActive();
   };
 
-  const calendarOptions = reactive({
+  const isViewActive = (view: string) => currentViewType.value === view;
+
+  function updateTodayActive() {
+    if (!calendarRef.value?.getApi()) return;
+    const api = calendarRef.value.getApi();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(api.view.currentStart);
+    const end = new Date(api.view.currentEnd);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    todayActive.value = today >= start && today < end;
+  }
+
+  const calendarOptions = reactive<CalendarOptions>({
     plugins: [],
-    initialView: selectedView.value,
+    initialView: VIEWS.MONTH,
     editable: true,
     selectable: true,
     events,
     headerToolbar: false,
     select: openMenu,
     eventClick: openMenu,
-    eventOverlap: true,
-    slotEventOverlap: true,
-    eventDrop: (info: any) => {
-      const idx = events.findIndex((e) => e.id === info.event.id);
-      if (idx >= 0) events[idx].start = info.event.start;
-    },
     datesSet: (info: any) => {
       currentTitle.value = info.view.title;
-      currentView.value = info.view;
+      currentViewType.value = info.view.type;
+      updateTodayActive();
     },
     dayCellDidMount: (info: any) => {
       const today = new Date();
@@ -181,7 +172,7 @@ export function useCalendar() {
   });
 
   onMounted(() => {
-    updateTitle();
+    updateTodayActive();
   });
 
   return {
@@ -204,7 +195,8 @@ export function useCalendar() {
     goPrev,
     goNext,
     changeView,
-    isTodayActive,
+    isViewActive,
+    todayActive,
     calendarOptions,
   };
 }

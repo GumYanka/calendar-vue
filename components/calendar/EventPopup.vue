@@ -71,12 +71,13 @@ function updateField(key: string, value: any) {
       />
       <textarea
         :value="modelValue.notes"
-        @input="updateField('notes', $event.target.value)"
+        @input="
+          (e) => updateField('notes', (e.target as HTMLTextAreaElement).value)
+        "
         placeholder="notes"
         class="border-b w-full border-gray-300 focus:border-gray-500 focus:outline-none placeholder-gray-400 text-gray-600 pr-8 py-1"
         rows="2"
-      ></textarea>
-
+      />
       <div class="flex justify-center">
         <ColorPicker
           :model-value="modelValue.color"

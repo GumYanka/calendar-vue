@@ -7,6 +7,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 
 import EventPopup from "~/components/calendar/EventPopup.vue";
 import { useCalendar } from "~/composables/useCalendar";
+import { VIEWS } from "../calendarConstants";
 
 const {
   calendarRef,
@@ -28,7 +29,8 @@ const {
   goPrev,
   goNext,
   changeView,
-  isTodayActive,
+  isViewActive,
+  todayActive,
   calendarOptions,
 } = useCalendar();
 
@@ -46,37 +48,43 @@ calendarOptions.plugins = [
   <div class="p-6 bg-white relative m-10" ref="calendarWrapper">
     <div class="flex justify-between">
       <h1 class="font-medium text-gray-600 text-m">Calendar view</h1>
-      <div>
-        <div class="flex shadow">
-          <button
-            class="px-4 py-1 text-gray-600 border-[1.5px] border-gray-300 rounded-l hover:text-cyan-500"
-            :class="selectedView === 'dayGridMonth' ? 'text-cyan-500' : ''"
-            @click="changeView('dayGridMonth')"
-          >
-            Month
-          </button>
-          <button
-            class="px-4 py-1 text-gray-600 border-y-[1.5px] border-r-[1.5px] border-gray-300 hover:text-cyan-500"
-            :class="selectedView === 'timeGridWeek' ? 'text-cyan-500' : ''"
-            @click="changeView('timeGridWeek')"
-          >
-            Week
-          </button>
-          <button
-            class="px-4 text-gray-600 py-1 border-y-[1.5px] border-gray-300 hover:text-cyan-500"
-            :class="selectedView === 'timeGridDay' ? 'text-cyan-500' : ''"
-            @click="changeView('timeGridDay')"
-          >
-            Day
-          </button>
-          <button
-            class="px-4 text-gray-600 py-1 border-[1.5px] border-gray-300 rounded-r hover:text-cyan-500"
-            :class="selectedView === 'listWeek' ? 'text-cyan-500' : ''"
-            @click="changeView('listWeek')"
-          >
-            Agenda
-          </button>
-        </div>
+      <div class="flex shadow">
+        <button
+          :class="[
+            'px-4 py-1 border border-gray-300 rounded-l',
+            isViewActive(VIEWS.MONTH) ? 'text-cyan-500' : 'text-gray-600',
+          ]"
+          @click="changeView(VIEWS.MONTH)"
+        >
+          Month
+        </button>
+        <button
+          :class="[
+            'px-4 py-1 border-t border-b border-r border-gray-300',
+            isViewActive(VIEWS.WEEK) ? 'text-cyan-500' : 'text-gray-600',
+          ]"
+          @click="changeView(VIEWS.WEEK)"
+        >
+          Week
+        </button>
+        <button
+          :class="[
+            'px-4 py-1 border-t border-b border-r border-gray-300',
+            isViewActive(VIEWS.DAY) ? 'text-cyan-500' : 'text-gray-600',
+          ]"
+          @click="changeView(VIEWS.DAY)"
+        >
+          Day
+        </button>
+        <button
+          :class="[
+            'px-4 py-1 border border-gray-300 rounded-r',
+            isViewActive(VIEWS.AGENDA) ? 'text-cyan-500' : 'text-gray-600',
+          ]"
+          @click="changeView(VIEWS.AGENDA)"
+        >
+          Agenda
+        </button>
       </div>
     </div>
 
@@ -87,22 +95,23 @@ calendarOptions.plugins = [
     <div class="flex justify-between items-center my-4">
       <div class="flex shadow">
         <button
-          :class="[
-            'px-4 py-1 border-[1.5px] text-gray-600 border-gray-300 rounded-l hover:text-cyan-500',
-            isTodayActive() ? 'text-cyan-500' : '',
-          ]"
+          :class="{
+            'px-4 py-1 border border-gray-300 rounded-l': true,
+            'text-cyan-500': todayActive,
+            'text-gray-600': !todayActive,
+          }"
           @click="goToday"
         >
           Today
         </button>
         <button
-          class="px-4 py-1 border-y-[1.5px] text-gray-600 border-gray-300 hover:text-cyan-500"
+          class="px-4 py-1 border-t border-b border-gray-300 text-gray-600 hover:text-cyan-500"
           @click="goPrev"
         >
           Back
         </button>
         <button
-          class="px-4 py-1 border-[1.5px] text-gray-600 border-gray-300 rounded-r hover:text-cyan-500"
+          class="px-4 py-1 border border-gray-300 rounded-r text-gray-600 hover:text-cyan-500"
           @click="goNext"
         >
           Next
